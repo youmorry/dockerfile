@@ -1,0 +1,43 @@
+{
+  "name": "Java 17 + Maven 3.9 (SDKMAN) - developer",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "args": {
+      "JAVA_VERSION_DEFAULT": "17.0.18-amzn",
+      "JAVA_VERSION_LATEST": "26-amzn",
+      "MAVEN_VERSION": "3.9.14",
+      "TZ": "${localEnv:TZ:Asia/Tokyo}",
+      "GIT_DELTA_VERSION": "0.19.2",
+      "ZSH_IN_DOCKER_VERSION": "1.2.1",
+      "NVM_VERSION": "0.40.4",
+      "NODE_VERSION": "24.15.0"
+    }
+  },
+  "remoteUser": "vscode",
+  "containerUser": "vscode",
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "java.jdt.ls.java.home": "/home/vscode/.sdkman/candidates/java/current",
+        "java.configuration.runtimes": [
+          {
+            "name": "JavaSE-17",
+            "path": "/home/vscode/.sdkman/candidates/java/current",
+            "default": true
+          }
+        ],
+        "maven.executable.path": "/home/vscode/.sdkman/candidates/maven/current/bin/mvn"
+      }
+    }
+  },
+  "mounts": [
+    "source=dockerfile-maven-${devcontainerId},target=/home/vscode/.m2,type=volume",
+    "source=dockerfile-commandhistory-${devcontainerId},target=/commandhistory,type=volume",
+    "source=dockerfile-config-${devcontainerId},target=/home/vscode/.claude,type=volume"
+  ],
+  "containerEnv": {
+    "CLAUDE_CONFIG_DIR": "/home/vscode/.claude",
+    "POWERLEVEL9K_DISABLE_GITSTATUS": "true"
+  },
+  "postCreateCommand": "java -version && mvn -v && whoami"
+}
