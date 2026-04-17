@@ -3,22 +3,27 @@
   "build": {
     "dockerfile": "Dockerfile",
     "args": {
-      "JAVA_VERSION_DEFAULT": "17.0.18-amzn",
-      "JAVA_VERSION_LATEST": "26-amzn",
-      "MAVEN_VERSION": "3.9.14",
       "TZ": "${localEnv:TZ:Asia/Tokyo}",
       "GIT_DELTA_VERSION": "0.19.2",
-      "ZSH_IN_DOCKER_VERSION": "1.2.1",
-      "NVM_VERSION": "0.40.4",
-      "NODE_VERSION": "24.15.0"
+      "ZSH_IN_DOCKER_VERSION": "1.2.1"
     }
+  },
+  "features": {
+      "ghcr.io/devcontainers/features/java:1": {
+        "version": "17.0.18",
+        "jdkDistro": "amzn",
+        "additionalVersions": "26",
+        "installMaven": true,
+        "mavenVersion": "3.9.14"
+      },
+      "ghcr.io/devcontainers/features/node:1": {}
   },
   "remoteUser": "vscode",
   "containerUser": "vscode",
   "customizations": {
     "vscode": {
       "settings": {
-        "java.jdt.ls.java.home": "/home/vscode/.sdkman/candidates/java/current",
+        "java.jdt.ls.java.home": "/home/vscode/.sdkman/candidates/java/26-amzn",
         "java.configuration.runtimes": [
           {
             "name": "JavaSE-17",
@@ -33,7 +38,7 @@
   "mounts": [
     "source=dockerfile-maven-${devcontainerId},target=/home/vscode/.m2,type=volume",
     "source=dockerfile-commandhistory-${devcontainerId},target=/commandhistory,type=volume",
-    "source=dockerfile-config-${devcontainerId},target=/home/vscode/.claude,type=volume"
+    "source=dockerfile-claude-${devcontainerId},target=/home/vscode/.claude,type=volume"
   ],
   "containerEnv": {
     "CLAUDE_CONFIG_DIR": "/home/vscode/.claude",

@@ -4,11 +4,6 @@ ARG TZ=Asia/Tokyo
 ENV TZ="$TZ"
 
 ARG USERNAME=vscode
-ARG JAVA_VERSION_DEFAULT=17.0.18-amzn
-ARG JAVA_VERSION_LATEST=26-amzn
-ARG MAVEN_VERSION=3.9.14
-ARG NVM_VERSION=0.40.4
-ARG NODE_VERSION=22
 ARG GIT_DELTA_VERSION=0.18.2
 ARG ZSH_IN_DOCKER_VERSION=1.2.0
 
@@ -42,10 +37,6 @@ RUN mkdir -p /usr/share/doc/fzf/examples \
   && wget -qO /usr/share/doc/fzf/examples/completion.zsh \
     https://raw.githubusercontent.com/junegunn/fzf/master/shell/completion.zsh
 
-# Ensure default node user has access to /usr/local/share
-RUN mkdir -p /usr/local/share/npm-global && \
-  chown -R $USERNAME:$USERNAME /usr/local/share
-
 # Persist zsh history.
 RUN mkdir /commandhistory \
   && touch /commandhistory/.zsh_history \
@@ -57,6 +48,9 @@ ENV DEVCONTAINER=true
 # Create workspace and config directories and set permissions
 RUN mkdir -p /workspace /home/$USERNAME/.claude && \
   chown -R $USERNAME:$USERNAME /workspace /home/$USERNAME/.claude
+
+# Set up Maven local repository directory and permissions
+RUN mkdir -p /home/$USERNAME/.m2 && chown -R $USERNAME:$USERNAME /home/$USERNAME/.m2
 
 WORKDIR /workspace
 
@@ -87,30 +81,6 @@ RUN sh -c "$(wget -O- https://github.com/deluan/zsh-in-docker/releases/download/
   -a "export HISTFILE=/commandhistory/.zsh_history" \
   -a "setopt SHARE_HISTORY INC_APPEND_HISTORY" \
   -x
-
-# SDKMAN + JDK + Maven
-ENV SDKMAN_DIR=/home/${USERNAME}/.sdkman
-RUN curl -fsSL "https://get.sdkman.io?rcupdate=false" | bash \
-  && source "${SDKMAN_DIR}/bin/sdkman-init.sh" \
-  && sdk install java ${JAVA_VERSION_LATEST} \
-  && sdk install java ${JAVA_VERSION_DEFAULT} \
-  && sdk default java ${JAVA_VERSION_DEFAULT} \
-  && sdk install maven ${MAVEN_VERSION} \
-  && sdk flush
-
-# 非対話シェル向け ENV
-ENV JAVA_HOME=${SDKMAN_DIR}/candidates/java/current \
-  MAVEN_HOME=${SDKMAN_DIR}/candidates/maven/current
-ENV PATH=${JAVA_HOME}/bin:${MAVEN_HOME}/bin:${PATH}
-
-# 対話シェル向け .zshrc
-RUN echo 'export SDKMAN_DIR="/home/${USERNAME}/.sdkman"' >> ~/.zshrc \
-  && echo '[[ -s "$SDKMAN_DIR/bin/sdkman-init.sh" ]] && source "$SDKMAN_DIR/bin/sdkman-init.sh"' >> ~/.zshrc
-
-# Install nvm + Node.js
-ENV NVM_DIR=/home/${USERNAME}/.nvm
-RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v${NVM_VERSION}/install.sh | PROFILE="/home/${USERNAME}/.zshrc" bash
-RUN source "${NVM_DIR}/nvm.sh" && nvm install $NODE_VERSION && nvm alias default $NODE_VERSION
 
 # Install Claude
 RUN curl -fsSL https://claude.ai/install.sh | bash
