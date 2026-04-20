@@ -5,7 +5,13 @@
     "args": {
       "TZ": "${localEnv:TZ:Asia/Tokyo}",
       "GIT_DELTA_VERSION": "0.19.2",
-      "ZSH_IN_DOCKER_VERSION": "1.2.1"
+      "ZSH_IN_DOCKER_VERSION": "1.2.1",
+      "HTTP_PROXY": "http://host.docker.internal:8080",
+      "HTTPS_PROXY": "http://host.docker.internal:8080",
+      "NO_PROXY": "localhost,127.0.0.1",
+      "http_proxy": "http://host.docker.internal:8080",
+      "https_proxy": "http://host.docker.internal:8080",
+      "no_proxy": "localhost,127.0.0.1"
     }
   },
   "features": {
@@ -16,7 +22,10 @@
         "installMaven": true,
         "mavenVersion": "3.9.14"
       },
-      "ghcr.io/devcontainers/features/node:1": {}
+      "ghcr.io/devcontainers/features/node:1": {},
+      "ghcr.io/devcontainers/features/docker-in-docker:2": {
+        "moby": false
+      }
   },
   "remoteUser": "vscode",
   "containerUser": "vscode",
@@ -43,6 +52,5 @@
   "containerEnv": {
     "CLAUDE_CONFIG_DIR": "/home/vscode/.claude",
     "POWERLEVEL9K_DISABLE_GITSTATUS": "true"
-  },
-  "postCreateCommand": "java -version && mvn -v && whoami"
+  }
 }

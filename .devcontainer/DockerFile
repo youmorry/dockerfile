@@ -6,6 +6,17 @@ ENV TZ="$TZ"
 ARG USERNAME=vscode
 ARG GIT_DELTA_VERSION=0.18.2
 ARG ZSH_IN_DOCKER_VERSION=1.2.0
+ARG HTTP_PROXY
+ARG HTTPS_PROXY
+ARG NO_PROXY
+ENV HTTP_PROXY=$HTTP_PROXY
+ENV HTTPS_PROXY=$HTTPS_PROXY
+ENV NO_PROXY=$NO_PROXY
+
+# Proxy settings for dockerd
+RUN echo 'Defaults env_keep += "HTTP_PROXY HTTPS_PROXY NO_PROXY http_proxy https_proxy no_proxy"' \
+    > /etc/sudoers.d/proxy \
+ && chmod 440 /etc/sudoers.d/proxy
 
 # Install necessary packages and clean up apt cache to reduce image size
 RUN apt-get update && apt-get install -y --no-install-recommends \
